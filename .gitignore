@@ -1,0 +1,8 @@
+node_module/
+.env
+npm-debug.log
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
