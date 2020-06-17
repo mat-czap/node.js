@@ -1,9 +1,8 @@
-const router = require('express').Router()
-const {authenticateToken} = require('../utiles/authenticate')
+const router = require("express").Router();
+const { authenticateToken } = require("../utiles/authenticate");
 
-router.get('/',authenticateToken,(req,res) =>{
-    console.log(req.user)
-    res.send("Got me!")
-})
+router.get("/", authenticateToken, (req, res) => {
+    res.json({"userID":req.user});
+});
 
-module.exports = router
+module.exports = router;

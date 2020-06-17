@@ -2,11 +2,15 @@ require("dotenv/config");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const User = require("../db/models/user");
-const {registerValidation, loginValidation} = require("../validations/UserValidate");
+const {
+	registerValidation,
+	loginValidation,
+} = require("../validations/UserValidate");
+const { generateToken } = require("../utiles/generateToken");
+const { sendToDb, removeFromDb } = require("../controllers/tokenController");
 const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
-	console.log(req.body.email)
 	// data validation
 	try {
 		registerValidation(req.body);
@@ -51,18 +55,28 @@ const loginUser = async (req, res) => {
 	const validPass = bcrypt.compare(req.body.password, foundUser.password);
 	if (!validPass) return res.status(400).send("invalid password");
 
-	//create token 
-	
-	const token = jwt.sign({ UserID: foundUser._id }, process.env.SECRET_JWT)
-	res.json({"authorization": token})
-	
-
+	//create token
+	const accessToken = generateToken({ userID: foundUser._id });
+	const refreshToken = jwt.sign(
+		{ userID: foundUser._id },
+		process.env.REFRESH_TOKEN
+	);
+	sendToDb(refreshToken);
+	res.json({ accessToken: accessToken, refreshToken: refreshToken });
 };
 
-// const logoutUser = () => {
-	
-// }
+const logoutUser = async (req, res) => {
+	RefreshToken = req.body.token;
+	if (RefreshToken == null || undefined) return res.sendStatus(403);
+	try {
+		const dbCallBack = removeFromDb(RefreshToken);
+		console.log(dbCallBack)
+		if (dbCallBack === "ok") return res.sendStatus(204);		
+	} catch (err) {
+		return res.send(err);
+	}
+};
 
-// module.exports.logoutUser = logoutUser;
 module.exports.registerUser = registerUser;
 module.exports.loginUser = loginUser;
+module.exports.logoutUser = logoutUser;

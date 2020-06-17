@@ -4,7 +4,6 @@ const express = require("express");
 const Redis = require("ioredis");
 const User = require("./db/models/user");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 const redis = new Redis({ db: 0 });
 const redis1 = new Redis({ db: 1 });
 
@@ -20,16 +19,16 @@ const port = 3000;
 app.listen(port);
 app.set("view engine", "hbs");
 
-// const permRoute = require("./routes/needPerm");
+const permRoute = require("./routes/needPerm");
 app.use("/api/auth", authRoute);
-// app.use("/api/perm", permRoute);
+app.use("/api/perm", permRoute);
 
 
-// const userRoute = require("./routes/users");
 
 app.use(morgan("combined"));
 // registering routes
 // app.use("/", userRoute);
+// const userRoute = require("./routes/users");
 
 redis.set("foo", "bar");
 redis1.set("foo1", "bar1");
@@ -41,7 +40,7 @@ function timeToExpire (token) {
 		return timeToExpire;
 };
 
-const token1 = jwt.sign({ user_id: "asdmokds" }, process.env.SECRET_JWT, {
+const token1 = jwt.sign({ user_id: "asdmokds" }, process.env.ACCESS_TOKEN, {
 	expiresIn: "30s",
 });
 
@@ -63,86 +62,6 @@ showScore();
 //model
 //connect to db
 
-
-// const findUsers = async () => {
-// 	try {
-// 		const users = await User.find({});
-// 		console.log(users);
-// 	} catch (err) {
-// 		console.log(err);
-// 	}
-// };
-
-// const UsersCount = async () => {
-// 	try {
-// 		const users = await User.find({}).count();
-// 		console.log(users);
-// 	} catch (err) {
-// 		console.log(err);
-// 	}
-// };
-
-// UsersCount()
-
-// const UsersCount = async () => {
-// 	try {
-// 		const users = await User.deleteMany({ age: 21 });
-// 		console.log(users);
-// 	} catch (err) {
-// 		console.log(err);
-// 	}
-// };
-
-// UsersCount();
-
-// const createuser = async data => {
-// 	try {
-// 		const user = new User(data);
-// 		await user.save();
-// 		console.log(user);
-// 	} catch (err) {
-// 		console.log(err);
-// 	}
-// };
-
-// createuser({
-// 	name: "Mateusz",
-// 	age: 27,
-// });
-
-// mongoDb config
-// const mongo = require('mongodb')
-// const mongoClient = mongo.MongoClient
-// const ObjectID = mongo.ObjectID
-// const url = 'mongodb://127.0.0.1:27017'
-// const dbname='Users'
-
-// mongoClient.connect(url,{}, (err,client)=>{
-//     if (err) {
-//         console.log("err")
-//     }
-//     console.log("connection is running")
-
-//     const db = client.db(dbname)
-
-// db.collection('people').insertOne({firstname: "Łukasz", lastname:"Czaprański", zona:"Marta"},(err,result)=>{
-//     if(err){
-//         console.log("hello",err)
-//     }
-//     // console.log(result)
-// })
-
-// db.collection('people').find().t((err,users)=>{
-//     console.log(users)
-// })
-// db.collection('people').updateOne({
-//     firstname: "Łukasz"
-// },{
-//     $rename:
-//         {"name":"zona"}
-
-// })
-// })
 
 app.get("/", function (req, res) {
 	res.render("index", {
