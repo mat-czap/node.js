@@ -2,7 +2,10 @@ require("dotenv/config");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const User = require("../db/models/user");
-const {registerValidation,loginValidation} = require("../validations/UserValidate");
+const {
+	registerValidation,
+	loginValidation,
+} = require("../validations/UserValidate");
 const { generateAccessToken } = require("../utiles/generateAccessToken");
 const { sendToDb, removeFromDb } = require("../controllers/tokenController");
 const jwt = require("jsonwebtoken");
@@ -53,18 +56,20 @@ const loginUser = async (req, res) => {
 	if (!validPass) return res.status(400).send("invalid password");
 
 	//create token
-	const accessToken = generateAccessToken({ userID: foundUser._id });
+	const accessToken = generateAccessToken(foundUser._id);
 	const refreshToken = jwt.sign(
 		{ userID: foundUser._id },
 		process.env.REFRESH_TOKEN
 	);
-	// storing refresh token in db 
+	// storing refresh token in db
 	sendToDb(refreshToken);
 	// set refresh token in cookie
-	res.cookie('refreshToken', refreshToken, { expires: new Date(Date.now() + 900000000), httpOnly: true });
+	res.cookie("refreshToken", refreshToken, {
+		expires: new Date(Date.now() + 900000000),
+		httpOnly: true,
+	});
 	// pass accessToken for frontend
-	res.json({accessToken: accessToken});
-	
+	res.json({ accessToken: accessToken });
 };
 
 const logoutUser = async (req, res) => {
@@ -72,7 +77,7 @@ const logoutUser = async (req, res) => {
 	if (RefreshToken == null || undefined) return res.sendStatus(403);
 	try {
 		const dbCallBack = await removeFromDb(RefreshToken);
-		if (dbCallBack === "ok") return res.sendStatus(204);		
+		if (dbCallBack === "ok") return res.sendStatus(204);
 	} catch (err) {
 		return res.send(err);
 	}

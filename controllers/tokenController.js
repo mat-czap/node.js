@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
-const {
-	generateAccessToken: generateToken,
-} = require("../utiles/generateAccessToken");
 const Redis = require("ioredis");
+const { generateAccessToken } = require("../utiles/generateAccessToken");
 const redis = new Redis({ db: 0 });
 
 const sendToDb = async data => {
@@ -24,26 +22,28 @@ const removeFromDb = async data => {
 	}
 };
 
-const checkIfKeyExists = async (data) => {
-    const key = await redis.exists(data)
-	console.log("KEY: ",key)
-	return key==1  
-}
+const checkIfKeyExists = async data => {
+	try {
+		const key = await redis.exists(data);
+		return key == 1;
+	} catch (err) {
+		return err;
+	}
+};
 
 const getAccessToken = async (req, res) => {
+	// getting refreshJWT from req obj
 	const refreshToken = req.body.token;
 	//check if refreshJWT were passed
 	if (refreshToken == null) return res.sendStatus(401);
 
-    //check if refreshJWT is in db
-    // TO INTRODUCE NEW FUNC!!! FOR REDIS! 
-    const tokenInDB = await checkIfKeyExists(refreshToken)
+	//check if refreshJWT is in RedidsDB
+	const tokenInDB = await checkIfKeyExists(refreshToken);
 	if (!tokenInDB) return res.sendStatus(403);
 
-	// check token
 	jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, { userID }) => {
 		if (err) return res.sendStatus(403).send(err);
-		const accessToken = generateToken(userID);
+		const accessToken = generateAccessToken(userID);
 		res.json({ newAccessToken: accessToken });
 	});
 };
