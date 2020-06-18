@@ -1,6 +1,7 @@
 require("./db/mongoose");
 require("dotenv/config");
 const express = require("express");
+const cors = require('cors')
 const Redis = require("ioredis");
 const User = require("./db/models/user");
 const mongoose = require("mongoose");
@@ -13,6 +14,7 @@ const jwtDecode = require("jwt-decode");
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 const authRoute = require("./routes/auth");
 
 const port = 3000;
@@ -24,28 +26,23 @@ app.use("/api/auth", authRoute);
 app.use("/api/perm", permRoute);
 
 
-
 app.use(morgan("combined"));
 // registering routes
 // app.use("/", userRoute);
 // const userRoute = require("./routes/users");
 
-redis.set("foo", "bar");
-redis1.set("foo1", "bar1");
+// redis.set("foo", "bar");
+// redis1.set("foo1", "bar1");
 
 
-function timeToExpire (token) {
-		const { user_id, iat, exp } = jwtDecode(token);
-		const timeToExpire = exp - iat
-		return timeToExpire;
-};
 
-const token1 = jwt.sign({ user_id: "asdmokds" }, process.env.ACCESS_TOKEN, {
-	expiresIn: "30s",
-});
 
-console.log(token1);
-console.log(timeToExpire(token1));
+// const token1 = jwt.sign({ user_id: "asdmokds" }, process.env.ACCESS_TOKEN, {
+// 	expiresIn: "30s",
+// });
+
+// console.log(token1);
+// console.log(timeToExpire(token1));
 
 const showScore = async () => {
 	try {
@@ -57,10 +54,7 @@ const showScore = async () => {
 	console.log("db0:", score, "db1:", score1);
 };
 
-showScore();
-
-//model
-//connect to db
+// showScore();
 
 
 app.get("/", function (req, res) {

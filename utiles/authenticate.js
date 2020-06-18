@@ -5,7 +5,6 @@ function authenticateToken(req, res, next) {
 	// getting token from header which equals "Bearer 029309213".It's needed 2nd part.
 	const authHeader = req.headers["authorization"];
 	const token = authHeader && authHeader.split(" ")[1];
-	console.log(token)
 	if (token == null || token == undefined) return res.sendStatus(401);
 
 	jwt.verify(token, process.env.ACCESS_TOKEN, (err,user ) => {
