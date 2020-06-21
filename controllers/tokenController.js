@@ -3,24 +3,31 @@ const Redis = require("ioredis");
 const { generateAccessToken } = require("../utiles/generateAccessToken");
 const redis = new Redis({ db: 0 });
 
-const sendToDb = async data => {
+const sendToDb = async data => new Promise((resolve,reject)=>{
 	if (data == null) throw new Error("token has not been passed");
-	try {
-		await redis.set(data, "");
-	} catch (err) {
-		return err;
-	}
-	return "ok";
-};
 
-const removeFromDb = async data => {
+	const redisSet= async data => await redis.set(data,"") 
+
 	try {
-		await redis.del(data);
-		return "ok";
+		redisSet(data)
+		resolve("ok");
 	} catch (err) {
-		return err;
+		return reject(err);
 	}
-};
+});
+
+const removeFromDb = async data => new Promise((resolve) => {
+	
+	const RedisDel= async data => await redis.del(data) 
+	
+	try {
+		RedisDel(data)
+		resolve("ok");
+	}
+	catch (err) {
+		reject(err);
+	}
+});
 
 const checkIfKeyExists = async data => {
 	try {

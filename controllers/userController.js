@@ -63,7 +63,7 @@ const loginUser = async (req, res) => {
 	);
 	// storing refresh token in db
 	sendToDb(refreshToken);
-	// set refresh token in cookie
+	// set refresh token in cookie for Client
 	res.cookie("refreshToken", refreshToken, {
 		expires: new Date(Date.now() + 900000000),
 		httpOnly: true,
