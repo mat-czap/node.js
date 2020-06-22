@@ -2,13 +2,13 @@ require("dotenv/config");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const User = require("../db/models/user");
+const jwt = require("jsonwebtoken");
 const {
 	registerValidation,
 	loginValidation,
 } = require("../validations/UserValidate");
 const { generateAccessToken } = require("../utiles/generateAccessToken");
-const { sendToDb, removeFromDb } = require("../controllers/tokenController");
-const jwt = require("jsonwebtoken");
+const { sendToDb, removeFromDb, addToBlackList } = require("../controllers/tokenController");
 
 const registerUser = async (req, res) => {
 	// data validation
@@ -51,7 +51,7 @@ const loginUser = async (req, res) => {
 	// check if email exists
 	const foundUser = await User.findOne({ email: req.body.email });
 	if (!foundUser) return res.status(400).send("email is wrong");
-	// check if password if valid
+	// check if password is valid
 	const validPass = bcrypt.compare(req.body.password, foundUser.password);
 	if (!validPass) return res.status(400).send("invalid password");
 
@@ -73,11 +73,13 @@ const loginUser = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
-	RefreshToken = req.body.token;
+	const RefreshToken = req.body.RefreshToken;
+	const AccessToken = req.body.AccessToken
 	if (RefreshToken == null || undefined) return res.sendStatus(403);
 	try {
 		const dbCallBack = await removeFromDb(RefreshToken);
-		if (dbCallBack === "ok") return res.sendStatus(204);
+		const dbCallbackBlackList = await addToBlackList(AccessToken);
+		if (dbCallBack === "ok" && dbCallbackBlackList === "ok" ) return res.sendStatus(204);
 	} catch (err) {
 		return res.send(err);
 	}
