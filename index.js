@@ -4,7 +4,7 @@ const authRoute = require("./routes/auth");
 const protectedRoute = require("./routes/needPerm");
 const express = require("express");
 const morgan = require("morgan");
-
+var cookieParser = require('cookie-parser')
 const cors = require("cors");
 
 const app = express();
@@ -14,6 +14,7 @@ app.listen(port);
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser())
 app.use(morgan("combined"));
 
 app.use("/api/auth", authRoute);

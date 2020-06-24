@@ -1,8 +1,11 @@
 const router = require("express").Router();
-const { authenticateToken } = require("../utiles/authenticate");
+const { authenticateToken, } = require("../utiles/authenticate");
+const {getUserRole,authRole,showAllUsers,showSingleUser} = require('../controllers/userController')
 
-router.get("/", authenticateToken, (req, res) => {
-    res.json({"userID":req.user});
-});
+
+// router.get("/", authenticateToken, userRole, showUsers);
+router.get("/", authenticateToken,getUserRole, authRole(["user"]), showSingleUser);
+router.get("/", authenticateToken,getUserRole, authRole(["admin"]),showAllUsers);
+
 
 module.exports = router;

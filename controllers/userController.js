@@ -8,7 +8,11 @@ const {
 	loginValidation,
 } = require("../validations/UserValidate");
 const { generateAccessToken } = require("../utiles/generateAccessToken");
-const { sendToDb, removeFromDb, addToBlackList } = require("../controllers/tokenController");
+const {
+	sendToDb,
+	removeFromDb,
+	addToBlackList,
+} = require("../controllers/tokenController");
 
 const registerUser = async (req, res) => {
 	// data validation
@@ -31,6 +35,7 @@ const registerUser = async (req, res) => {
 		name: req.body.name,
 		email: req.body.email,
 		password: hashedpassword,
+		role: req.body.role,
 	};
 
 	try {
@@ -50,11 +55,10 @@ const loginUser = async (req, res) => {
 	}
 	// check if email exists
 	const foundUser = await User.findOne({ email: req.body.email });
-	if (!foundUser) return res.status(400).send("email is wrong");
+	if (!foundUser) return res.status(400).send("email is incorrect");
 	// check if password is valid
 	const validPass = bcrypt.compare(req.body.password, foundUser.password);
 	if (!validPass) return res.status(400).send("invalid password");
-
 	//create token
 	const accessToken = generateAccessToken(foundUser._id);
 	const refreshToken = jwt.sign(
@@ -69,22 +73,68 @@ const loginUser = async (req, res) => {
 		httpOnly: true,
 	});
 	// pass accessToken for frontend
-	res.json({ accessToken: accessToken });
+	res.json({ authorization: `Bearer ${accessToken}` });
 };
 
 const logoutUser = async (req, res) => {
 	const RefreshToken = req.body.RefreshToken;
-	const AccessToken = req.body.AccessToken
+	const AccessToken = req.body.AccessToken;
 	if (RefreshToken == null || undefined) return res.sendStatus(403);
+	//toDo: condition for accessToken
 	try {
 		const dbCallBack = await removeFromDb(RefreshToken);
 		const dbCallbackBlackList = await addToBlackList(AccessToken);
-		if (dbCallBack === "ok" && dbCallbackBlackList === "ok" ) return res.sendStatus(204);
+		if (dbCallBack === "ok" && dbCallbackBlackList === "ok")
+			return res.sendStatus(204);
 	} catch (err) {
 		return res.send(err);
 	}
 };
 
+async function getUserRole(req, res, next) {
+	// getting token from header which equals eg. "Bearer 029309213".It's needed 2nd part.
+	try {
+		const foundUser = await User.findOne({ _id: req.user });
+		req.userRole = foundUser.role;
+		next();
+	} catch (err) {
+		if (err) return next(err);
+	}
+}
+
+const authRole = role => {
+	return (req, res, next) => {
+		// if (req.userRole !== role[0]) {
+		if (!role.includes(req.userRole)) {
+			return next("route");
+		}
+		next();
+	};
+};
+
+const showAllUsers = async (req,res) => {
+	try {
+		const users = await User.find({});
+		return res.json({ users: users });
+	} catch (err) {
+		return res.send(err);
+	}
+};
+
+const showSingleUser = async (req,res) => {
+		try {
+			const user = await User.find({ _id: req.user });
+			return res.json({ user: user });
+		} catch (err) {
+			res.send(err);
+		}
+};
+
+
 module.exports.registerUser = registerUser;
 module.exports.loginUser = loginUser;
 module.exports.logoutUser = logoutUser;
+module.exports.showSingleUser = showSingleUser;
+module.exports.showAllUsers = showAllUsers;
+module.exports.getUserRole = getUserRole;
+module.exports.authRole = authRole;
