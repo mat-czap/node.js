@@ -23,6 +23,9 @@
     "mongodb": "^3.5.8",
     "mongoose": "^5.9.18",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "pg": "^8.2.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.1.0"
   }
 }
