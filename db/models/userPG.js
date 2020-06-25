@@ -9,6 +9,13 @@ module.exports = (sequelize, Sequelize) => {
       },
       password: {
         type: Sequelize.STRING
+      },
+      testid:{
+        type:Sequelize.INTEGER,
+        references:{
+          model: 'Test',
+          key:'id'
+        }
       }
     }, {
       freezeTableName: true

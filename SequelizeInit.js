@@ -1,5 +1,7 @@
 const dbConfig = require("./pgConfig");
-const model = require("./db/models/userPG");
+const modelUser = require("./db/models/userPG");
+const modelTest = require("./db/models/modelTest");
+
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 	host: dbConfig.HOST,
@@ -13,6 +15,10 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 	},
 });
 
-const User = model(sequelize, Sequelize);
+const User = modelUser(sequelize, Sequelize);
+const Test = modelTest(sequelize, Sequelize);
 
-module.exports = User;
+User.belongsTo(Test,)
+
+module.exports.User = User;
+module.exports.Test = Test;
