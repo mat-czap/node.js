@@ -7,14 +7,14 @@ const redisBlackList = new Redis({ db: 1 });
 
 const sendToDb = data =>
 	new Promise((resolve, reject) => {
-		if (data == null) throw new Error("token has not been passed");
+		if (data == null) reject("token has not been passed");
 		redis.set(data, "");
 		resolve("ok");
 	});
 
 const removeFromDb = data =>
 	new Promise((resolve, reject) => {
-		if (data == null) throw new Error("token has not been passed");
+		if (data == null) reject("token has not been passed");
 		redis.del(data);
 		resolve("ok");
 	});

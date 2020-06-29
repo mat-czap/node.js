@@ -1,6 +1,7 @@
 require("dotenv/config");
 const bcrypt = require("bcryptjs");
-const User = require("../db/models/user");
+// const User = require("../db/models/user");
+const userTEST = require("../db/repositoryUser");
 const jwt = require("jsonwebtoken");
 const {
 	registerValidation,
@@ -12,6 +13,16 @@ const {
 	removeFromDb,
 	addToBlackList,
 } = require("../controllers/tokenController");
+
+const repoPatternTestShowAllUser = async (req, res) => {
+	try {
+		const users = await userTEST.showAllUsers();
+		// console.log(users);
+		return res.json({ users: users });
+	} catch (err) {
+		return res.send(err);
+	}
+};
 
 const registerUser = async (req, res) => {
 	// data validation
@@ -111,7 +122,7 @@ const authRole = role => {
 	};
 };
 
-const showAllUsers = async (req,res) => {
+const showAllUsers = async (req, res) => {
 	try {
 		const users = await User.find({});
 		return res.json({ users: users });
@@ -120,15 +131,14 @@ const showAllUsers = async (req,res) => {
 	}
 };
 
-const showSingleUser = async (req,res) => {
-		try {
-			const user = await User.find({ _id: req.user });
-			return res.json({ user: user });
-		} catch (err) {
-			res.send(err);
-		}
+const showSingleUser = async (req, res) => {
+	try {
+		const user = await User.find({ _id: req.user });
+		return res.json({ user: user });
+	} catch (err) {
+		res.send(err);
+	}
 };
-
 
 module.exports.registerUser = registerUser;
 module.exports.loginUser = loginUser;
@@ -137,3 +147,4 @@ module.exports.showSingleUser = showSingleUser;
 module.exports.showAllUsers = showAllUsers;
 module.exports.getUserRole = getUserRole;
 module.exports.authRole = authRole;
+module.exports.repoPatternTestShowAllUser = repoPatternTestShowAllUser;

@@ -1,6 +1,8 @@
 const dbConfig = require("./pgConfig");
+
 const modelUser = require("./db/models/userPG");
-const modelTest = require("./db/models/modelTest");
+const modelPassport = require("./db/models/passportPG");
+
 
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
@@ -15,10 +17,15 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 	},
 });
 
-const User = modelUser(sequelize, Sequelize);
-const Test = modelTest(sequelize, Sequelize);
+const db = {}
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
-User.belongsTo(Test,)
+//models
+db.users = modelUser(sequelize, Sequelize);
+db.passports = modelPassport(sequelize, Sequelize);
 
-module.exports.User = User;
-module.exports.Test = Test;
+// /relations
+db.passports.belongsTo(db.users)
+
+module.exports = db;

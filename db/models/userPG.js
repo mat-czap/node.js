@@ -1,22 +1,19 @@
 module.exports = (sequelize, Sequelize) => {
-    
+  const { DataTypes } = Sequelize
+
     const User = sequelize.define('users', {
       name: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING,
+        allowNull:false,
       },
       email: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING,
+        allowNull:false,
       },
       password: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING,
+        allowNull:false,
       },
-      testid:{
-        type:Sequelize.INTEGER,
-        references:{
-          model: 'Test',
-          key:'id'
-        }
-      }
     }, {
       freezeTableName: true
   });
