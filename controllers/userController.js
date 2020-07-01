@@ -1,6 +1,6 @@
 require("dotenv/config");
 const bcrypt = require("bcryptjs");
-// const User = require("../db/models/user");
+const User = require("../db/models/user");
 const userTEST = require("../db/repositoryUser");
 const jwt = require("jsonwebtoken");
 const {
@@ -14,15 +14,6 @@ const {
 	addToBlackList,
 } = require("../controllers/tokenController");
 
-const repoPatternTestShowAllUser = async (req, res) => {
-	try {
-		const users = await userTEST.showAllUsers();
-		// console.log(users);
-		return res.json({ users: users });
-	} catch (err) {
-		return res.send(err);
-	}
-};
 
 const registerUser = async (req, res) => {
 	// data validation
@@ -31,10 +22,19 @@ const registerUser = async (req, res) => {
 	} catch (err) {
 		return res.status(400).send(err);
 	}
-	//checking if the email exists
+	// checking if the email exists
 	const emailExist = await User.findOne({ email: req.body.email });
 	if (emailExist)
 		return res.status(400).send("passed email exists, please try different!");
+
+	//check if the email exists REPO PATTERN
+	try {
+		const isEmailTaken = await userTEST.isEmailTaken(req.body.email);
+		if (isEmailTaken)
+		return res.status(400).send("passed email exists, please try different!");
+	} catch (err) {
+		return res.status(400).send(err.message);
+	}
 
 	//hash password
 	const salt = await bcrypt.genSalt(10);
@@ -47,10 +47,12 @@ const registerUser = async (req, res) => {
 		password: hashedpassword,
 		role: req.body.role,
 	};
-
 	try {
-		const newUser = await new User(reqData).save();
-		res.send({ userID: newUser._id });
+		// const newUser = await new User(reqData).save();
+		const newUser = await userTEST.addUser(reqData);
+		// res.send({ userID: newUser._id });
+		res.send({ userID: newUser.id });
+
 	} catch (err) {
 		console.log(err);
 	}
@@ -63,18 +65,37 @@ const loginUser = async (req, res) => {
 	} catch (err) {
 		console.log(err);
 	}
+	
+	//REPO PATTERN
+
 	// check if email exists
-	const foundUser = await User.findOne({ email: req.body.email });
+	const foundUser = await userTEST.getUser(req.body.email);
 	if (!foundUser) return res.status(400).send("email is incorrect");
 	// check if password is valid
-	const validPass = bcrypt.compare(req.body.password, foundUser.password);
+	const validPass = await bcrypt.compare(req.body.password, foundUser.password);
 	if (!validPass) return res.status(400).send("invalid password");
 	//create token
-	const accessToken = generateAccessToken(foundUser._id);
+	const accessToken = generateAccessToken(foundUser.id);
 	const refreshToken = jwt.sign(
-		{ userID: foundUser._id },
+		{ userID: foundUser.id },
 		process.env.REFRESH_TOKEN
 	);
+
+	//MONGO
+	
+	// check if email exists
+	// const foundUser = await User.findOne({ email: req.body.email });
+	// if (!foundUser) return res.status(400).send("email is incorrect");
+	// // check if password is valid
+	// const validPass = bcrypt.compare(req.body.password, foundUser.password);
+	// if (!validPass) return res.status(400).send("invalid password");
+	// //create token
+	// const accessToken = generateAccessToken(foundUser._id);
+	// const refreshToken = jwt.sign(
+	// 	{ userID: foundUser._id },
+	// 	process.env.REFRESH_TOKEN
+	// );
+	
 	// storing refresh token in db
 	sendToDb(refreshToken);
 	// set refresh token in cookie for Client
@@ -147,4 +168,3 @@ module.exports.showSingleUser = showSingleUser;
 module.exports.showAllUsers = showAllUsers;
 module.exports.getUserRole = getUserRole;
 module.exports.authRole = authRole;
-module.exports.repoPatternTestShowAllUser = repoPatternTestShowAllUser;

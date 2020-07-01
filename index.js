@@ -22,22 +22,22 @@ app.use(morgan("combined"));
 app.use("/api/auth", authRoute);
 app.use("/api/perm", protectedRoute);
 
-db.sequelize.sync({ force: true });
+// db.sequelize.sync({ force: true });
 
 
 
-// const aaa = async ()=> {
-//     await db.sequelize.sync({ force: true })
-//     await db.users.create({name:"ads",email:"asddas",password:"asddas"})
-//     await db.users.create({name:"ads",email:"asddas",password:"asddas"})
-//     await db.passports.create({nazwa:"adssad", userId:1})
+const aaa = async ()=> {
+    await db.sequelize.sync({ force: true })
+    await db.users.create({name:"mat",email:"czap",password:"czap",role:"admin"})
+    await db.users.create({name:"ads",email:"asddas",password:"asddas",role:"user"})
+    // await db.passports.create({nazwa:"adssad", userId:1})
 
 
-//     const result_users = await db.users.findAll();
-//     console.log("All users:", JSON.stringify(result_users, null, 2));
-// }
+    const result_users = await db.users.findAll();
+    console.log("All users:", JSON.stringify(result_users, null, 2));
+}
 
-// aaa()
+aaa()
 
 
 // app.set("view engine", "hbs");
