@@ -1,37 +1,43 @@
+require("dotenv/config");
 const repositoryMongo = require("./repositoryMongo");
 const repositoryPostgres = require("./repositoryPostgres");
 const modelMongo = require("../db/models/user");
-const modelPostgres = require("../SequelizeInit").users;
+const { users: modelPostgres } = require("../SequelizeInit");
 
-const TYPE_POSTGRES = "postgres";
-const TYPE_MONGODB = "mongo";
+const DB_MODEL = process.env.USER_DB_NAME;
 
 class userRepository {
-
-	constructor(type) {
-		this.type = type;
-		this.repository = this._factoryRepository(this.type);
+	constructor(userDB) {
+		this.userDB = userDB;
+		this.repository = this._factoryRepository(this.userDB);
 	}
 
 	//Factory repository
-	_factoryRepository(type) {
-		if (type === TYPE_MONGODB) {
+	_factoryRepository(userDB) {
+		const TYPES = {
+			POSTGRES: "postgres",
+			MONGODB: "mongo",
+		};
+
+		if (userDB === TYPES.MONGODB) {
 			return new repositoryMongo(modelMongo);
 		}
-		if (type === TYPE_POSTGRES) {
+		if (userDB === TYPES.POSTGRES) {
 			return new repositoryPostgres(modelPostgres);
 		}
-		throw new Error("please check passing type of database repository.");
+		throw new Error(
+			`Wrong argument in _factoryRepository, passed: ${userDB}, should be one of: ${Object.values(TYPES)}.`
+		);
 	}
 
 	//Public methods
 
 	//->Object (User data)
-	async getUser(email) {
+	async getUserByEmail(email) {
 		return await this.repository.getUserByEmail(email);
 	}
 	//->Object (User data)
-	async getUser(id) {
+	async getUserById(id) {
 		return await this.repository.getUserById(id);
 	}
 	//->Boolean
@@ -42,11 +48,10 @@ class userRepository {
 	async addUser(obj) {
 		return await this.repository.addUser(obj);
 	}
-	//->List[obj]
+	//->List[obj] (User data)
 	async showAllUsers() {
 		return await this.repository.showAllUsers();
 	}
 }
 
-const User = new userRepository("postgres");
-module.exports = User;
+module.exports = new userRepository(DB_MODEL);

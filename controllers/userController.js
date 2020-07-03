@@ -1,8 +1,8 @@
 require("dotenv/config");
 const bcrypt = require("bcryptjs");
-const User = require("../db/models/user");
-const userTEST = require("../db/repositoryUser");
 const jwt = require("jsonwebtoken");
+// const User = require("../db/models/user");
+const userTEST = require("../db/repositoryUser");
 const {
 	registerValidation,
 	loginValidation,
@@ -14,7 +14,6 @@ const {
 	addToBlackList,
 } = require("../controllers/tokenController");
 
-
 const registerUser = async (req, res) => {
 	// data validation
 	try {
@@ -22,16 +21,18 @@ const registerUser = async (req, res) => {
 	} catch (err) {
 		return res.status(400).send(err);
 	}
+	
+	// REPO MONGO
 	// checking if the email exists
-	const emailExist = await User.findOne({ email: req.body.email });
-	if (emailExist)
-		return res.status(400).send("passed email exists, please try different!");
+	// const emailExist = await User.findOne({ email: req.body.email });
+	// if (emailExist)
+	// 	return res.status(400).send("passed email exists, please try different!");
 
 	//check if the email exists REPO PATTERN
 	try {
 		const isEmailTaken = await userTEST.isEmailTaken(req.body.email);
 		if (isEmailTaken)
-		return res.status(400).send("passed email exists, please try different!");
+			return res.status(400).send("passed email exists, please try different!");
 	} catch (err) {
 		return res.status(400).send(err.message);
 	}
@@ -48,11 +49,11 @@ const registerUser = async (req, res) => {
 		role: req.body.role,
 	};
 	try {
+		// REPO MONGO
 		// const newUser = await new User(reqData).save();
-		const newUser = await userTEST.addUser(reqData);
 		// res.send({ userID: newUser._id });
+		const newUser = await userTEST.addUser(reqData);
 		res.send({ userID: newUser.id });
-
 	} catch (err) {
 		console.log(err);
 	}
@@ -65,11 +66,11 @@ const loginUser = async (req, res) => {
 	} catch (err) {
 		console.log(err);
 	}
-	
+
 	//REPO PATTERN
 
 	// check if email exists
-	const foundUser = await userTEST.getUser(req.body.email);
+	const foundUser = await userTEST.getUserByEmail(req.body.email);
 	if (!foundUser) return res.status(400).send("email is incorrect");
 	// check if password is valid
 	const validPass = await bcrypt.compare(req.body.password, foundUser.password);
@@ -82,7 +83,6 @@ const loginUser = async (req, res) => {
 	);
 
 	//MONGO
-	
 	// check if email exists
 	// const foundUser = await User.findOne({ email: req.body.email });
 	// if (!foundUser) return res.status(400).send("email is incorrect");
@@ -95,7 +95,7 @@ const loginUser = async (req, res) => {
 	// 	{ userID: foundUser._id },
 	// 	process.env.REFRESH_TOKEN
 	// );
-	
+
 	// storing refresh token in db
 	sendToDb(refreshToken);
 	// set refresh token in cookie for Client
@@ -125,7 +125,8 @@ const logoutUser = async (req, res) => {
 async function getUserRole(req, res, next) {
 	// getting token from header which equals eg. "Bearer 029309213".It's needed 2nd part.
 	try {
-		const foundUser = await User.findOne({ _id: req.user });
+		// const foundUser = await User.findOne({ _id: req.user });
+		const foundUser = await userTEST.getUserById(req.user);
 		req.userRole = foundUser.role;
 		next();
 	} catch (err) {
@@ -145,7 +146,8 @@ const authRole = role => {
 
 const showAllUsers = async (req, res) => {
 	try {
-		const users = await User.find({});
+		// const users = await User.find({});
+		const users = await userTEST.showAllUsers();
 		return res.json({ users: users });
 	} catch (err) {
 		return res.send(err);
@@ -154,7 +156,8 @@ const showAllUsers = async (req, res) => {
 
 const showSingleUser = async (req, res) => {
 	try {
-		const user = await User.find({ _id: req.user });
+		// const user = await User.find({ _id: req.user });
+		const user = await userTEST.getUserById(req.user);
 		return res.json({ user: user });
 	} catch (err) {
 		res.send(err);
