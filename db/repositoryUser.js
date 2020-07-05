@@ -56,11 +56,10 @@ class userRepository {
 	async updateUser(id){
 		return await this.repository.updateUser(id);
 	}
-	
+	//->String
 	async removeUser(id){
 		return await this.repository.removeUser(id);
 	}
-	
  
 }
 
