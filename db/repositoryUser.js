@@ -52,6 +52,16 @@ class userRepository {
 	async showAllUsers() {
 		return await this.repository.showAllUsers();
 	}
+	//->Object (User data)
+	async updateUser(id){
+		return await this.repository.updateUser(id);
+	}
+	
+	async removeUser(id){
+		return await this.repository.removeUser(id);
+	}
+	
+ 
 }
 
 module.exports = new userRepository(DB_MODEL);

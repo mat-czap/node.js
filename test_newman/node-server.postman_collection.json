@@ -1,0 +1,521 @@
+{
+	"info": {
+		"_postman_id": "733d6dce-1d1e-4809-b5c1-fcd4b5b39a46",
+		"name": "node-server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "register",
+			"item": [
+				{
+					"name": "register user1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "62ebf762-e5f4-4f59-a9f6-cfee19a8efc1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"new user id=1\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(jsonData);",
+									"    pm.expect(jsonData.userID).to.equal(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"mateusz\",\n    \"email\": \"mateusz@mateusz.pl\",\n    \"password\": \"mateusz\",\n    \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register user1 [incorrect data]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "62ebf762-e5f4-4f59-a9f6-cfee19a8efc1",
+								"exec": [
+									"pm.test(\"incorrect data - validation process\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"aa\",\n    \"email\": \"aa\",\n    \"password\": \"mateusz\",\n    \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register user2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "baa8e2ff-4442-4587-8321-d139cca6831f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"new user id=2\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.userID).to.equal(2);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"nicole\",\n    \"email\": \"nicole@nicole.pl\",\n    \"password\": \"nicole\",\n    \"role\": \"user\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "login user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7c890c9b-7174-4f59-99bd-57bd8648df27",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"",
+							"postman.setEnvironmentVariable('refreshToken', pm.cookies.get('refreshToken'));",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"accessToken\", jsonData.authorization);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mateusz@mateusz.pl\",\n\t\"password\": \"mateusz\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "requierd: email and password in request body as json.\nReceiving in a response: refreshToken in cookie and accessToken in header"
+			},
+			"response": []
+		},
+		{
+			"name": "refresh token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "613b3f7c-2236-4ed9-a7fa-787199d9ac6b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"    ",
+							"var resJson=pm.response.json();",
+							"pm.environment.set(\"accessToken\", resJson.newAccessToken);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "35fce677-880d-4782-82fb-5413fd7d4ab7",
+						"exec": [
+							"console.log(pm.environment.get('accessToken'))",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{refreshToken}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/auth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"auth",
+						"token"
+					]
+				},
+				"description": "By using refreshToken and hit under this url, there is possibility to acquiring new accessToken(also with relatively short expire time). It let you get an authorized resources from API."
+			},
+			"response": []
+		},
+		{
+			"name": "Route with permission + role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dfdd01ee-1d27-452c-88f0-a1861bb7bc47",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/perm",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"perm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "01d9ec06-d9e5-4b69-8ebb-0ef175c9b5f5",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"RefreshToken\": \"{{refreshToken}}\",\n\t\"AccessToken\": \"{{accessToken}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/auth/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"auth",
+						"logout"
+					]
+				},
+				"description": "it couses removing refreshToken from db on the server and put accesstoken to BLACKLIST \nuntil it expires"
+			},
+			"response": []
+		},
+		{
+			"name": "refresh token after logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "613b3f7c-2236-4ed9-a7fa-787199d9ac6b",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "35fce677-880d-4782-82fb-5413fd7d4ab7",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{refreshToken}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/auth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"auth",
+						"token"
+					]
+				},
+				"description": "Normally, all refreshTokens are storing in non-relational db on the server side, in this case after logout user, perticular one is removed from db. \nSo after hitting in refreshing endpoint it will turn out that refreshToken is no longer valid and client obtained 403 Status."
+			},
+			"response": []
+		},
+		{
+			"name": "Route with permission after logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dfdd01ee-1d27-452c-88f0-a1861bb7bc47",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"type": "text",
+						"value": "Bearer {{accessToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/perm",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"perm"
+					]
+				},
+				"description": "Theoretically, User's accessToken is still valid when user decided to logout, therefore token is sent to db called __BLACKLIST__. When user tries to use authorized route, algorithm will check if his token is not stored in BLACKLIST. If it turned out true, access will denied."
+			},
+			"response": []
+		},
+		{
+			"name": "clear database",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "01d9ec06-d9e5-4b69-8ebb-0ef175c9b5f5",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/test/dropDB",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"test",
+						"dropDB"
+					]
+				},
+				"description": "for testing purposes only."
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer"
+	},
+	"protocolProfileBehavior": {}
+}
